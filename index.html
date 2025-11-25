@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LYNXhire · Intelligent Shortlisting Assistant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="brand-block">
+        <div class="brand-title" id="brandTitle">LYNXhire</div>
+        <div class="brand-subtitle" id="brandSubtitle">Intelligent shortlisting for staffing agencies</div>
+      </div>
+      <div class="header-meta">
+        <span class="pill pill-outline">Local-only · No backend</span>
+        <span class="pill pill-solid" id="ownerBadge">Unassigned owner</span>
+      </div>
+    </header>
+
+    <div class="app-body">
+      <nav class="side-nav">
+        <button class="nav-item active" data-tab="dashboardTab">Dashboard</button>
+        <button class="nav-item" data-tab="analyzerTab">Candidate Analyzer</button>
+        <button class="nav-item" data-tab="simulatorTab">Scenario Simulator</button>
+        <button class="nav-item" data-tab="sourcingTab">Talent Sourcing</button>
+        <button class="nav-item" data-tab="feedbackTab">Feedback Hub</button>
+        <button class="nav-item" data-tab="reportsTab">Report Generator</button>
+        <button class="nav-item" data-tab="settingsTab">Brand & Settings</button>
+      </nav>
+
+      <main class="main-panel">
+        <!-- DASHBOARD -->
+        <section id="dashboardTab" class="tab-panel active">
+          <div class="panel-header">
+            <h1>Session Dashboard</h1>
+            <p>Overview of the current role and candidates analysed in this session.</p>
+          </div>
+          <div class="grid grid-3">
+            <div class="card metric-card">
+              <div class="metric-label">Active candidates</div>
+              <div class="metric-value" id="metricCandidates">0</div>
+              <div class="metric-note" id="metricCandidatesNote">Add candidates from the Analyzer tab.</div>
+            </div>
+            <div class="card metric-card">
+              <div class="metric-label">Average overall fit</div>
+              <div class="metric-value" id="metricAvgFit">–</div>
+              <div class="metric-note" id="metricAvgFitNote">No data yet.</div>
+            </div>
+            <div class="card metric-card">
+              <div class="metric-label">Top future performance</div>
+              <div class="metric-value" id="metricTopFPS">–</div>
+              <div class="metric-note" id="metricTopFPSNote">Analyse at least one candidate.</div>
+            </div>
+          </div>
+
+          <div class="grid grid-2 mt-lg">
+            <div class="card">
+              <div class="card-header">
+                <h2>Role snapshot</h2>
+              </div>
+              <div id="dashboardRoleBlock" class="empty-block">
+                <p>No role analysed yet. Paste a job description in the Candidate Analyzer tab.</p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h2>Session insights</h2>
+              </div>
+              <ul id="dashboardInsights" class="insights-list">
+                <li>No candidates yet. Once you add profiles, key insights will appear here.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card mt-lg">
+            <div class="card-header">
+              <h2>Candidates overview</h2>
+            </div>
+            <div id="dashboardCandidates" class="candidate-list empty-block">
+              <p>As you add candidates from the Analyzer, they will appear here with key metrics.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ANALYZER -->
+        <section id="analyzerTab" class="tab-panel">
+          <div class="panel-header">
+            <h1>Candidate Analyzer</h1>
+            <p>Paste a job description, then analyse each candidate’s CV against it.</p>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h2>Role definition</h2>
+            </div>
+            <div class="card-body">
+              <div class="grid grid-2">
+                <div class="field">
+                  <label for="jobTitleInput">Role title</label>
+                  <input id="jobTitleInput" type="text" placeholder="e.g. Saldatore MIG/MAG – Acciaieria NordFerro">
+                </div>
+                <div class="field">
+                  <label for="jobLocationInput">Job location</label>
+                  <input id="jobLocationInput" type="text" placeholder="e.g. Bergamo, Lombardia (full on-site)">
+                </div>
+              </div>
+              <div class="field mt-md">
+                <label for="jobDescriptionInput">Job description</label>
+                <textarea id="jobDescriptionInput" rows="8" placeholder="Paste the full job posting text here..."></textarea>
+              </div>
+              <button id="analyzeRoleBtn" class="btn primary mt-md">Analyze role</button>
+              <div id="roleKeywordsBlock" class="mt-md muted-text"></div>
+            </div>
+          </div>
+
+          <div class="grid grid-2 mt-lg">
+            <div class="card">
+              <div class="card-header">
+                <h2>New candidate</h2>
+              </div>
+              <div class="card-body">
+                <div class="field">
+                  <label for="candidateNameInput">Name</label>
+                  <input id="candidateNameInput" type="text" placeholder="e.g. Lorenzo Valli">
+                </div>
+                <div class="field">
+                  <label for="candidateLocationInput">Location</label>
+                  <input id="candidateLocationInput" type="text" placeholder="e.g. Bergamo">
+                </div>
+                <div class="field">
+                  <label for="candidateCvInput">CV / profile text</label>
+                  <textarea id="candidateCvInput" rows="10" placeholder="Paste the full CV or summary here..."></textarea>
+                </div>
+                <button id="analyzeCandidateBtn" class="btn primary mt-md">Analyze & add candidate</button>
+                <div id="candidateAnalyzerMessage" class="mt-sm muted-text"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h2>Candidates in this session</h2>
+              </div>
+              <div id="analyzerCandidatesList" class="candidate-list empty-block">
+                <p>No candidates analysed yet.</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="candidateDetailCard" class="card mt-lg hidden">
+            <div class="card-header">
+              <h2 id="candidateDetailTitle">Candidate detail</h2>
+            </div>
+            <div class="card-body">
+              <div class="grid grid-3">
+                <div>
+                  <div class="metric-label">Overall fit</div>
+                  <div id="detailFitScore" class="metric-value">–</div>
+                </div>
+                <div>
+                  <div class="metric-label">Future performance</div>
+                  <div id="detailFpsScore" class="metric-value">–</div>
+                </div>
+                <div>
+                  <div class="metric-label">Geo match</div>
+                  <div id="detailGeoScore" class="metric-value">–</div>
+                </div>
+              </div>
+
+              <div class="grid grid-2 mt-lg">
+                <div>
+                  <h3>Soft skills map</h3>
+                  <canvas id="softSkillRadar" height="220"></canvas>
+                </div>
+                <div>
+                  <h3>Summary & tags</h3>
+                  <div id="detailSummaryText" class="muted-text"></div>
+                  <div id="detailTags" class="tag-row mt-sm"></div>
+                  <div class="field mt-md">
+                    <label for="detailNotesInput">Recruiter notes (local to this session)</label>
+                    <textarea id="detailNotesInput" rows="4"></textarea>
+                  </div>
+                  <button id="saveNotesBtn" class="btn secondary mt-sm">Save notes</button>
+                  <button id="copySummaryBtn" class="btn ghost mt-sm">Copy summary text</button>
+                </div>
+              </div>
+
+              <div class="grid grid-2 mt-lg">
+                <div>
+                  <h3>Strengths</h3>
+                  <ul id="detailStrengths" class="bullet-list"></ul>
+                </div>
+                <div>
+                  <h3>Risks & watchpoints</h3>
+                  <ul id="detailRisks" class="bullet-list"></ul>
+                  <ul id="detailLinguisticRisks" class="bullet-list muted-text mt-sm"></ul>
+                </div>
+              </div>
+
+              <div class="mt-lg">
+                <h3>Suggested interview questions</h3>
+                <ul id="detailQuestions" class="bullet-list"></ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SIMULATOR -->
+        <section id="simulatorTab" class="tab-panel">
+          <div class="panel-header">
+            <h1>Scenario Simulator</h1>
+            <p>Pick a candidate and simulate the first 90 days in the role.</p>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <div class="grid grid-2">
+                <div class="field">
+                  <label for="simCandidateSelect">Candidate</label>
+                  <select id="simCandidateSelect">
+                    <option value="">No candidates yet</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="simFocusInput">Scenario focus (optional)</label>
+                  <input id="simFocusInput" type="text" placeholder="e.g. onboarding speed, relationship with line manager">
+                </div>
+              </div>
+              <button id="runSimulationBtn" class="btn primary mt-md">Run 90-day simulation</button>
+              <div id="simulationOutput" class="mt-md simulation-output"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SOURCING -->
+        <section id="sourcingTab" class="tab-panel">
+          <div class="panel-header">
+            <h1>Talent Sourcing</h1>
+            <p>Generate smart Google queries for live job ads and potential candidates.</p>
+          </div>
+          <div class="grid grid-2">
+            <div class="card">
+              <div class="card-header">
+                <h2>Job ads search</h2>
+              </div>
+              <div class="card-body">
+                <div class="field">
+                  <label for="srcRoleInput">Role keywords</label>
+                  <input id="srcRoleInput" type="text" placeholder="e.g. &quot;saldatore mig mag&quot; bergamo">
+                </div>
+                <div class="field">
+                  <label for="srcExtraInput">Extra filters (optional)</label>
+                  <input id="srcExtraInput" type="text" placeholder="e.g. acciaieria, tempo indeterminato">
+                </div>
+                <button id="buildJobSearchBtn" class="btn primary mt-md">Build job search links</button>
+                <div id="jobSearchLinks" class="mt-md link-list"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h2>Candidate search</h2>
+              </div>
+              <div class="card-body">
+                <div class="field">
+                  <label for="srcCandidateInput">Candidate profile keywords</label>
+                  <input id="srcCandidateInput" type="text" placeholder="e.g. &quot;full stack developer&quot; react node &quot;milano&quot;">
+                </div>
+                <button id="buildCandidateSearchBtn" class="btn primary mt-md">Build candidate search links</button>
+                <div id="candidateSearchLinks" class="mt-md link-list"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- FEEDBACK HUB -->
+        <section id="feedbackTab" class="tab-panel">
+          <div class="panel-header">
+            <h1>Feedback Hub</h1>
+            <p>Create a sharable link that encodes your feedback locally in the URL hash.</p>
+          </div>
+          <div class="grid grid-2">
+            <div class="card">
+              <div class="card-header">
+                <h2>Create feedback link</h2>
+              </div>
+              <div class="card-body">
+                <div class="field">
+                  <label for="feedbackInput">Feedback text / context</label>
+                  <textarea id="feedbackInput" rows="8" placeholder="Write your notes or feedback here..."></textarea>
+                </div>
+                <button id="generateFeedbackLinkBtn" class="btn primary mt-md">Generate sharable link</button>
+                <div id="feedbackLinkOutput" class="mt-md muted-text"></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h2>Loaded from URL</h2>
+              </div>
+              <div class="card-body">
+                <p class="muted-text">If the current URL contains a <code>#feedback=...</code> hash, its content is decoded and shown here.</p>
+                <div id="feedbackDecodedBlock" class="feedback-decoded"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- REPORTS -->
+        <section id="reportsTab" class="tab-panel">
+          <div class="panel-header">
+            <h1>Report Generator</h1>
+            <p>Generate a print-ready candidate report for clients or hiring managers.</p>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <div class="grid grid-2">
+                <div class="field">
+                  <label for="reportCandidateSelect">Candidate</label>
+                  <select id="reportCandidateSelect">
+                    <option value="">No candidates yet</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="reportContextInput">Client / role context (optional)</label>
+                  <input id="reportContextInput" type="text" placeholder="e.g. Shortlist for NordFerro – Saldatore MIG/MAG – Bergamo">
+                </div>
+              </div>
+              <button id="generateReportBtn" class="btn primary mt-md">Open report window</button>
+              <p class="muted-text mt-sm">You can print or export as PDF from your browser.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="settingsTab" class="tab-panel">
+          <div class="panel-header">
+            <h1>Brand & Settings</h1>
+            <p>Adapt LYNXhire to your agency name. Settings are stored locally in this browser.</p>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <div class="field">
+                <label for="brandNameInput">Product / tool name</label>
+                <input id="brandNameInput" type="text" placeholder="e.g. LYNXhire or a white-label name">
+              </div>
+              <div class="field">
+                <label for="ownerNameInput">Agency / owner name</label>
+                <input id="ownerNameInput" type="text" placeholder="e.g. Generazione Vincente">
+              </div>
+              <button id="saveSettingsBtn" class="btn primary mt-md">Save branding</button>
+              <p class="muted-text mt-sm">Branding is saved in your browser only (localStorage).</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/app.js" defer></script>
+</body>
+</html>
